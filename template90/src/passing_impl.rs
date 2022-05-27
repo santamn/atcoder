@@ -63,7 +63,7 @@ fn dijkstra(adj_list: &Vec<Vec<Edge>>, start: usize) -> Vec<usize> {
 
     dist
 }
-
+x
 #[fastout]
 fn main() {
     input! {
