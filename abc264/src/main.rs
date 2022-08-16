@@ -31,8 +31,8 @@ impl UnionFind {
     }
 
     fn unite(&mut self, x: usize, y: usize) {
-        let mut x = self.root(x);
-        let mut y = self.root(y);
+        let x = self.root(x);
+        let y = self.root(y);
 
         if x == y {
             return;
