@@ -1,47 +1,44 @@
-use proconio::{marker::Chars, *};
-use std::cmp::max;
+use proconio::marker::Usize1;
+use proconio::*;
+
+type Graph = Vec<Vec<usize>>;
+
+fn graph_from_edges(nodes: usize, edges: &Vec<(usize, usize)>) -> Graph {
+    let mut graph = vec![Vec::new(); nodes];
+    for (u, v) in edges {
+        graph[*u].push(*v);
+    }
+    graph
+}
 
 fn main() {
     input! {
-        s: Chars,
-        t: Chars,
+        n: usize, m: usize,
+        edges: [(Usize1, Usize1); m],
     }
 
-    // dp[i][j]: tをi文字目まで、sをj文字目まで使ってできる最長の部分文字列の長さ
-    let mut dp: Vec<Vec<isize>> = vec![vec![std::isize::MIN; s.len() + 1]; t.len() + 1];
-    dp[0] = vec![0; s.len() + 1];
-    for i in 0..=t.len() {
-        dp[i][0] = 0;
+    let graph = graph_from_edges(n, &edges);
+    let mut flags = vec![false; n];
+    let mut dp = vec![0usize; n];
+    for i in 0..n {
+        length(&graph, &mut flags, &mut dp, i);
     }
 
-    for i in 1..=t.len() {
-        for j in 1..=s.len() {
-            dp[i][j] = if t[i - 1] == s[j - 1] {
-                dp[i - 1][j - 1] + 1
-            } else {
-                max(dp[i - 1][j], dp[i][j - 1])
-            }
-        }
-    }
+    println!("{}", dp.iter().max().unwrap());
+}
 
-    let mut length = dp[t.len()][s.len()] as usize;
-    let mut i = t.len();
-    let mut j = s.len();
-    let mut answer = vec![char::default(); length];
-    while length > 0 {
-        if t[i - 1] == s[j - 1] {
-            answer[length - 1] = t[i - 1];
-            length -= 1;
-            i -= 1;
-            j -= 1;
-        } else {
-            if dp[i][j] == dp[i - 1][j] {
-                i -= 1;
-            } else {
-                j -= 1;
-            }
-        }
-    }
+fn length(graph: &Graph, flags: &mut Vec<bool>, memo: &mut Vec<usize>, node: usize) -> usize {
+    if flags[node] {
+        return memo[node];
+    } else {
+        flags[node] = true;
 
-    println!("{}", answer.into_iter().collect::<String>())
+        memo[node] = graph[node]
+            .iter()
+            .map(|&v| length(graph, flags, memo, v) + 1)
+            .max()
+            .unwrap_or_default();
+
+        return memo[node];
+    }
 }
