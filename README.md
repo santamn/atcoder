@@ -1,6 +1,9 @@
 # AtCoder知見シート
 
 ## 気を付けることリスト
+
+## 問題に詰まったときは
+
 - B問題
   - 前列挙や3重ループなどを使う愚直解の可能性をまず考える
 
@@ -25,7 +28,10 @@ fn main() {
 }
 ```
 
-参照：[abc269 E問題](abc269/src/main.rs)
+#### 参照
+
+- [abc269 E問題](abc269/src/main.rs)
+- [C - Yamanote Line Game 解説](https://atcoder.jp/contests/abc244/editorial/3625)
 
 ## 問題について
 
