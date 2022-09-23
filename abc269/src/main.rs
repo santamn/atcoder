@@ -57,7 +57,7 @@ fn ask<R: BufRead>(
     println!("? {} {} {} {}", a, b, c, d);
 
     input! {
-        from &mut LineSource::new(BufReader::new(std::io::stdin())),
+        from source,
         t: isize,
     }
     if t < 0 {
