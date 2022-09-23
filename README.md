@@ -25,7 +25,7 @@ fn main() {
 }
 ```
 
-参照：[abc269 E問題](abc269/main.rs])
+参照：[abc269 E問題](abc269/src/main.rs)
 
 ## 問題について
 
