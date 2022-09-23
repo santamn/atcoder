@@ -6,6 +6,25 @@
 
 - 2変数あるきは1変数固定してみるのが基本
 
+### インタラクティブ問題の注意点
+
+proconio::input!マクロをデフォルトで使う場合、ジャッジ環境では入力を一度に全部読み取ってしまうため、一行ずつ読み取るように以下のようにfromを指定する必要がある。
+
+```rust
+use proconio::{input, source::line::LineSource};
+use std::io::{BufRead, BufReader};
+
+fn main() {
+    let mut source = LineSource::new(BufReader::new(std::io::stdin()));
+    input! {
+        from &mut source,
+        n: usize,
+    }
+
+  ...
+}
+```
+
 ## 問題について
 
 ABCの各問題に関するざっくりとした傾向 
