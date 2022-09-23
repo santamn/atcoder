@@ -1,9 +1,10 @@
 use proconio::{input, source::line::LineSource};
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 
 fn main() {
+    let mut source = LineSource::new(BufReader::new(std::io::stdin()));
     input! {
-        from &mut LineSource::new(BufReader::new(std::io::stdin())),
+        from &mut source,
         n: usize,
     }
 
@@ -11,7 +12,7 @@ fn main() {
     let mut b = n + 1;
     while b - a > 1 {
         let mid = (b + a) / 2;
-        match ask(a, mid - 1, 1, n) {
+        match ask(&mut source, a, mid - 1, 1, n) {
             Ok(t) => {
                 if t == mid - a {
                     a = mid;
@@ -29,7 +30,7 @@ fn main() {
     let mut d = n + 1;
     while d - c > 1 {
         let mid = (d + c) / 2;
-        match ask(1, n, c, mid - 1) {
+        match ask(&mut source, 1, n, c, mid - 1) {
             Ok(t) => {
                 if t == mid - c {
                     c = mid;
@@ -46,7 +47,13 @@ fn main() {
     println!("! {} {}", a, c);
 }
 
-fn ask(a: usize, b: usize, c: usize, d: usize) -> Result<usize, ()> {
+fn ask<R: BufRead>(
+    source: &mut LineSource<R>,
+    a: usize,
+    b: usize,
+    c: usize,
+    d: usize,
+) -> Result<usize, ()> {
     println!("? {} {} {} {}", a, b, c, d);
 
     input! {
