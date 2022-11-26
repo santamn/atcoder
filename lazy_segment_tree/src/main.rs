@@ -1,18 +1,12 @@
-use num_traits::One;
 use proconio::{input, marker::Usize1};
-use std::cmp::PartialEq;
-use std::convert::From;
-use std::ops::{Mul, MulAssign};
-
 use segment_tree::{LazySegTree, Monoid, Operator};
-
-impl<T: PartialEq + Mul<Output = Self> + MulAssign + One> Monoid for T {}
+use std::convert::From;
 
 // maxを積にとるモノイド: (X, max)
 #[derive(Clone, Copy, PartialEq)]
 enum Max {
     Num(usize),
-    NegativeInf,
+    NegInf,
 }
 
 impl From<usize> for Max {
@@ -25,32 +19,20 @@ impl From<Max> for usize {
     fn from(m: Max) -> Self {
         match m {
             Max::Num(n) => n,
-            Max::NegativeInf => 0,
+            Max::NegInf => 0,
         }
     }
 }
 
-impl Mul for Max {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
+monoid! {
+    Max;
+    one = Max::NegInf;
+    mul(self, other) = {
+        match (self, other) {
             (Self::Num(n), Self::Num(m)) => Self::Num(std::cmp::max(n, m)),
-            (Self::NegativeInf, Self::NegativeInf) => Self::NegativeInf,
+            (Self::NegInf, Self::NegInf) => Self::NegInf,
             (Self::Num(n), _) | (_, Self::Num(n)) => Self::Num(n),
         }
-    }
-}
-
-impl MulAssign for Max {
-    fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
-    }
-}
-
-impl One for Max {
-    fn one() -> Self {
-        Max::NegativeInf
     }
 }
 
@@ -67,26 +49,14 @@ impl From<usize> for Assign {
     }
 }
 
-impl Mul for Assign {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        match rhs {
+monoid! {
+    Assign;
+    one = Assign::T;
+    mul(self, other) = {
+        match other {
             Self::Num(m) => Self::Num(m),
             Self::T => self,
         }
-    }
-}
-
-impl MulAssign for Assign {
-    fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
-    }
-}
-
-impl One for Assign {
-    fn one() -> Self {
-        Assign::T
     }
 }
 
@@ -99,7 +69,7 @@ impl Operator<Max> for Assign {
 
         match (self, x) {
             (Self::Num(n), Max::Num(_)) => Max::Num(n),
-            (Self::Num(_), Max::NegativeInf) => Max::NegativeInf,
+            (Self::Num(_), Max::NegInf) => Max::NegInf,
             (Self::T, x) => x,
         }
     }
@@ -141,10 +111,11 @@ fn compress(bricks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
 }
 
 mod segment_tree {
-    use num_traits::One;
     use std::ops::{Mul, MulAssign, Range};
 
-    pub trait Monoid: PartialEq + Mul<Output = Self> + MulAssign + One {}
+    pub trait Monoid: Sized + PartialEq + Mul<Output = Self> + MulAssign {
+        fn one() -> Self;
+    }
 
     pub trait Operator<X> {
         fn act(self, x: X) -> X;
@@ -269,5 +240,39 @@ mod segment_tree {
         } else {
             Relation::Separate
         }
+    }
+
+    #[allow(unused_macros)]
+    #[macro_export]
+    macro_rules! monoid {
+        (
+            $type:ty where  [$( $params:tt )*];
+            one = $one:expr;
+            mul($self:ident, $y:ident) =  $code:block
+            $(;)*
+        ) => {
+            impl<$($params)*> std::ops::Mul for $type {
+                type Output = Self;
+                fn mul($self, $y: Self) -> Self { $code }
+            }
+            impl<$($params)*> std::ops::MulAssign for $type where Self: Clone {
+                fn mul_assign(&mut $self, $y: Self) {
+                    *$self = (*$self).clone() * $y;
+                }
+            }
+            impl<$($params)*> Monoid for $type {
+                #[inline(always)]
+                fn one() -> Self { $one }
+            }
+        };
+
+        (
+            $type:ty;
+            one = $one:expr;
+            mul($self:ident, $y:ident) = $code:block
+            $(;)*
+        ) => {
+            monoid! { $type where []; one = $one; mul($self, $y) = $code; }
+        };
     }
 }
