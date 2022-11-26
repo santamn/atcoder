@@ -24,7 +24,7 @@ impl From<Max> for usize {
     }
 }
 
-monoid! {
+def_monoid! {
     Max;
     one = Max::NegInf;
     mul(self, other) = {
@@ -49,7 +49,7 @@ impl From<usize> for Assign {
     }
 }
 
-monoid! {
+def_monoid! {
     Assign;
     one = Assign::T;
     mul(self, other) = {
@@ -244,7 +244,7 @@ mod segment_tree {
 
     #[allow(unused_macros)]
     #[macro_export]
-    macro_rules! monoid {
+    macro_rules! def_monoid {
         (
             $type:ty where  [$( $params:tt )*];
             one = $one:expr;
@@ -272,7 +272,7 @@ mod segment_tree {
             mul($self:ident, $y:ident) = $code:block
             $(;)*
         ) => {
-            monoid! { $type where []; one = $one; mul($self, $y) = $code; }
+            def_monoid! { $type where []; one = $one; mul($self, $y) = $code; }
         };
     }
 }
