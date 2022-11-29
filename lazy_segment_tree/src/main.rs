@@ -1,12 +1,23 @@
 use proconio::{input, marker::Usize1};
 use segment_tree::{LazySegTree, Monoid, Operator};
-use std::convert::From;
 
-// maxを積にとるモノイド: (X, max)
+// maxを積にとるモノイド: (Max, -∞, max)
 #[derive(Clone, Copy, PartialEq)]
 enum Max {
     Num(usize),
     NegInf,
+}
+
+def_monoid! {
+    Max;
+    one = Self::NegInf;
+    mul(self, other) = {
+        match (self, other) {
+            (Self::Num(n), Self::Num(m)) => Self::Num(std::cmp::max(n, m)),
+            (Self::NegInf, Self::NegInf) => Self::NegInf,
+            (Self::Num(n), _) | (_, Self::Num(n)) => Self::Num(n),
+        }
+    }
 }
 
 impl From<usize> for Max {
@@ -24,34 +35,16 @@ impl From<Max> for usize {
     }
 }
 
-def_monoid! {
-    Max;
-    one = Max::NegInf;
-    mul(self, other) = {
-        match (self, other) {
-            (Self::Num(n), Self::Num(m)) => Self::Num(std::cmp::max(n, m)),
-            (Self::NegInf, Self::NegInf) => Self::NegInf,
-            (Self::Num(n), _) | (_, Self::Num(n)) => Self::Num(n),
-        }
-    }
-}
-
-// 代入を積に取り、作用としても代入をもつモノイド: (M, 代入)
+// 代入を積に取り、作用としても代入をもつモノイド: (Assign, T, 代入)
 #[derive(Clone, Copy, PartialEq)]
 enum Assign {
     Num(usize),
     T,
 }
 
-impl From<usize> for Assign {
-    fn from(n: usize) -> Self {
-        Self::Num(n)
-    }
-}
-
 def_monoid! {
     Assign;
-    one = Assign::T;
+    one = Self::T;
     mul(self, other) = {
         match other {
             Self::Num(m) => Self::Num(m),
@@ -62,16 +55,16 @@ def_monoid! {
 
 impl Operator<Max> for Assign {
     fn act(self, x: Max) -> Max {
-        // match self {
-        //     Self::Num(n) => MaxMonoid::Num(n),
-        //     Self::T => x,
-        // }
-
-        match (self, x) {
-            (Self::Num(n), Max::Num(_)) => Max::Num(n),
-            (Self::Num(_), Max::NegInf) => Max::NegInf,
-            (Self::T, x) => x,
+        match self {
+            Self::Num(n) => Max::Num(n),
+            Self::T => x,
         }
+    }
+}
+
+impl From<usize> for Assign {
+    fn from(n: usize) -> Self {
+        Self::Num(n)
     }
 }
 
@@ -84,6 +77,7 @@ fn main() {
     let bricks = compress(&bricks);
     let mut answer = vec![0; n];
     let mut lst = LazySegTree::<Max, Assign>::new(vec![0.into(); bricks.len() * 2]);
+
     for (i, (l, r)) in bricks.into_iter().enumerate() {
         let (l, r) = if l < r { (l, r + 1) } else { (r, l + 1) };
         let max: usize = lst.query(&(l..r)).into();
@@ -136,7 +130,7 @@ mod segment_tree {
             let leaves = next_power_of_two(v.len());
             let lazy = vec![M::one(); leaves * 2 - 1];
             let mut data = vec![X::one(); leaves * 2 - 1];
-            for (i, &k) in v.iter().enumerate() {
+            for (i, k) in v.into_iter().enumerate() {
                 data[i + leaves - 1] = k;
             }
             Self::recur(&mut data, 0, leaves);
@@ -153,7 +147,6 @@ mod segment_tree {
             }
         }
 
-        // propagate operation in i-th node
         fn eval(&mut self, i: usize) {
             let m = self.lazy[i];
             if m == M::one() {
@@ -167,7 +160,6 @@ mod segment_tree {
             self.lazy[i] = M::one();
         }
 
-        // let m act on range
         pub fn apply(&mut self, range: &Range<usize>, m: M) {
             self._apply(range, m, 0, &(0..self.leaves));
         }
@@ -246,7 +238,7 @@ mod segment_tree {
     #[macro_export]
     macro_rules! def_monoid {
         (
-            $type:ty where  [$( $params:tt )*];
+            $type:ty where [$( $params:tt )*];
             one = $one:expr;
             mul($self:ident, $y:ident) =  $code:block
             $(;)*
