@@ -115,6 +115,61 @@ mod segment_tree {
         fn act(self, x: X) -> X;
     }
 
+    pub struct SegTree<X> {
+        leaves: usize,
+        data: Vec<X>,
+    }
+
+    impl<X> SegTree<X>
+    where
+        X: Copy + Monoid,
+    {
+        pub fn new(v: Vec<X>) -> Self {
+            let leaves = next_power_of_two(v.len());
+            let mut data = vec![X::one(); leaves * 2 - 1];
+            for (i, k) in v.into_iter().enumerate() {
+                data[i] = k;
+            }
+            Self::recur(&mut data, 0, leaves);
+            Self { leaves, data }
+        }
+
+        fn recur(data: &mut Vec<X>, i: usize, leaves: usize) -> X {
+            if i >= leaves - 1 {
+                data[i]
+            } else {
+                data[i] =
+                    Self::recur(data, i * 2 + 1, leaves) * Self::recur(data, i * 2 + 2, leaves);
+                data[i]
+            }
+        }
+
+        pub fn update(&mut self, i: usize, x: X) {
+            let mut i = i + self.leaves - 1;
+            self.data[i] = x;
+            while i > 0 {
+                i = (i - 1) / 2;
+                self.data[i] = self.data[i * 2 + 1] * self.data[i * 2 + 2];
+            }
+        }
+
+        pub fn query(&mut self, range: &Range<usize>) -> X {
+            self._query(range, 0, &(0..self.leaves))
+        }
+
+        fn _query(&mut self, range: &Range<usize>, i: usize, section: &Range<usize>) -> X {
+            match position(range, section) {
+                Relation::Separate => X::one(),
+                Relation::Include => self.data[i],
+                _ => {
+                    let mid = (section.start + section.end) / 2;
+                    self._query(range, i * 2 + 1, &(section.start..mid))
+                        * self._query(range, i * 2 + 2, &(mid..section.end))
+                }
+            }
+        }
+    }
+
     pub struct LazySegTree<X, M> {
         leaves: usize, // 葉の数
         data: Vec<X>,  // セグメント木
