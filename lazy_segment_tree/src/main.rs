@@ -104,6 +104,7 @@ fn compress(bricks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
         .collect()
 }
 
+#[allow(dead_code)]
 mod segment_tree {
     use std::ops::{Mul, MulAssign, Range};
 
@@ -289,7 +290,6 @@ mod segment_tree {
         }
     }
 
-    #[allow(unused_macros)]
     #[macro_export]
     macro_rules! def_monoid {
         (
