@@ -131,18 +131,8 @@ mod segment_tree {
             for (i, k) in v.into_iter().enumerate() {
                 data[i] = k;
             }
-            Self::recur(&mut data, 0, leaves);
+            recursive_build(&mut data, 0, leaves);
             Self { leaves, data }
-        }
-
-        fn recur(data: &mut Vec<X>, i: usize, leaves: usize) -> X {
-            if i >= leaves - 1 {
-                data[i]
-            } else {
-                data[i] =
-                    Self::recur(data, i * 2 + 1, leaves) * Self::recur(data, i * 2 + 2, leaves);
-                data[i]
-            }
         }
 
         pub fn update(&mut self, i: usize, x: X) {
@@ -189,18 +179,8 @@ mod segment_tree {
             for (i, k) in v.into_iter().enumerate() {
                 data[i + leaves - 1] = k;
             }
-            Self::recur(&mut data, 0, leaves);
+            recursive_build(&mut data, 0, leaves);
             Self { leaves, data, lazy }
-        }
-
-        fn recur(data: &mut Vec<X>, i: usize, leaves: usize) -> X {
-            if i >= leaves - 1 {
-                data[i]
-            } else {
-                data[i] =
-                    Self::recur(data, i * 2 + 1, leaves) * Self::recur(data, i * 2 + 2, leaves);
-                data[i]
-            }
         }
 
         fn eval(&mut self, i: usize) {
@@ -268,6 +248,16 @@ mod segment_tree {
             n += 1;
         }
         n
+    }
+
+    fn recursive_build<X: Clone + Monoid>(data: &mut Vec<X>, i: usize, leaves: usize) -> X {
+        if i >= leaves - 1 {
+            data[i].clone()
+        } else {
+            data[i] =
+                recursive_build(data, i * 2 + 1, leaves) * recursive_build(data, i * 2 + 2, leaves);
+            data[i].clone()
+        }
     }
 
     enum Relation {
