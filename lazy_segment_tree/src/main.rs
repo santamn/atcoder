@@ -116,7 +116,10 @@ mod segment_tree {
         fn act(self, x: X) -> X;
     }
 
-    pub struct SegTree<X> {
+    pub struct SegTree<X>
+    where
+        X: Monoid,
+    {
         leaves: usize,
         data: Vec<X>,
     }
@@ -135,6 +138,7 @@ mod segment_tree {
             Self { leaves, data }
         }
 
+        // 代入更新
         pub fn update(&mut self, i: usize, x: X) {
             let mut i = i + self.leaves - 1;
             self.data[i] = x;
@@ -144,6 +148,7 @@ mod segment_tree {
             }
         }
 
+        // 区間取得
         pub fn query(&mut self, range: &Range<usize>) -> X {
             self._query(range, 0, &(0..self.leaves))
         }
@@ -161,7 +166,11 @@ mod segment_tree {
         }
     }
 
-    pub struct LazySegTree<X, M> {
+    pub struct LazySegTree<X, M>
+    where
+        X: Monoid,
+        M: Monoid + Operator<X>,
+    {
         leaves: usize, // 葉の数
         data: Vec<X>,  // セグメント木
         lazy: Vec<M>,  // 遅延作用
@@ -183,6 +192,7 @@ mod segment_tree {
             Self { leaves, data, lazy }
         }
 
+        // 遅延作用の伝播
         fn eval(&mut self, i: usize) {
             let m = self.lazy[i];
             if m == M::one() {
@@ -196,6 +206,7 @@ mod segment_tree {
             self.lazy[i] = M::one();
         }
 
+        // 区間作用
         pub fn apply(&mut self, range: &Range<usize>, m: M) {
             self._apply(range, m, 0, &(0..self.leaves));
         }
@@ -219,6 +230,7 @@ mod segment_tree {
             }
         }
 
+        // 区間取得
         pub fn query(&mut self, range: &Range<usize>) -> X {
             self._query(range, 0, &(0..self.leaves))
         }
@@ -280,6 +292,9 @@ mod segment_tree {
         }
     }
 
+    // モノイドトレイトを自作の型に実装するときに使うマクロ
+    // 下記のサイトに書かれているものを少し変更したものを使っています
+    // https://cympfh.cc/procon/algebra.monoid.html
     #[macro_export]
     macro_rules! def_monoid {
         (
