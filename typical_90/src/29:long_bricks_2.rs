@@ -9,7 +9,7 @@ fn main() {
     }
 
     let bricks = compress(&bricks);
-    let mut heights = vec![0; 2 * n + 1];
+    let mut heights = vec![0; 2 * n];
     let mut answer = vec![0; n];
     for (i, &(l, r)) in bricks.iter().enumerate() {
         let (l, r) = if l < r { (l, r + 1) } else { (r, l + 1) };
@@ -25,7 +25,7 @@ fn main() {
     }
 }
 
-// 区間圧縮する関数
+// 座標圧縮する関数
 fn compress(bricks: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
     let mut arr: Vec<usize> = bricks.iter().map(|&(l, r)| vec![l, r]).flatten().collect();
     arr.sort();
