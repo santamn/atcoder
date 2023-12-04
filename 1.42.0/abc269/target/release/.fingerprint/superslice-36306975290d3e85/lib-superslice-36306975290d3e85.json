@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":7471847284577215369,"profile":2574335274271406459,"path":16069668902588771593,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/superslice-36306975290d3e85/dep-lib-superslice-36306975290d3e85"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":10357308077444556008}

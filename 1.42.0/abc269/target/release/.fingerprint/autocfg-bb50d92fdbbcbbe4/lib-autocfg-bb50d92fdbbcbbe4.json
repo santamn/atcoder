@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":8574161726611873773,"profile":2574335274271406459,"path":826475905923403806,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/autocfg-bb50d92fdbbcbbe4/dep-lib-autocfg-bb50d92fdbbcbbe4"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":13102859075309379048}

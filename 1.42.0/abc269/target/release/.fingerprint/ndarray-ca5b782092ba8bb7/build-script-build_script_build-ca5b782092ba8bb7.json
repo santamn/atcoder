@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":10429514197457385088,"profile":2574335274271406459,"path":13257325350638473992,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/ndarray-ca5b782092ba8bb7/dep-build-script-build_script_build-ca5b782092ba8bb7"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":12734421682426488421}

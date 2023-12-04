@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":11680772787092534394,"profile":2574335274271406459,"path":8093820427279286661,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/smallvec-aca595972429c69a/dep-lib-smallvec-aca595972429c69a"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":11511323240339246835}

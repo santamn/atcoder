@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":2674817973793942601,"profile":2574335274271406459,"path":6163261637491188253,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/whiteread-118481bd24c332cb/dep-lib-whiteread-118481bd24c332cb"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":3885787538349159651}

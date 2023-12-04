@@ -1,0 +1,1 @@
+{"rustc":13355374433309949680,"features":"[]","target":15211964875088169130,"profile":2574335274271406459,"path":985508231038804488,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"release/.fingerprint/bitset-fixed-8f3899abf320420e/dep-lib-bitset_fixed-8f3899abf320420e"}}],"rustflags":["-C","link-arg=--ld-path=/usr/local/bin/ld64.mold"],"metadata":2462255793053404173}
