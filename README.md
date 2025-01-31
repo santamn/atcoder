@@ -108,3 +108,7 @@ ABCの各問題に関するざっくりとした傾向
 
 - いもす法  
   累積和のアルゴリズムを多次元，多次数に拡張したもの。入ったところで+1、出たところで-1として数える。
+
+## cargo-compete
+
+- [cargo-competeの使い方](https://github.com/qryxip/cargo-compete/blob/master/README-ja.md)
