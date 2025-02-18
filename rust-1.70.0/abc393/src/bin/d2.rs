@@ -16,5 +16,5 @@ fn main() {
         .collect::<Vec<_>>();
 
     let median = a[a.len() / 2];
-    println!("{}", a.iter().fold(0, |acc, &x| acc + (median - x).abs()));
+    println!("{}", a.iter().map(|&x| (x - median).abs()).sum::<i64>());
 }
