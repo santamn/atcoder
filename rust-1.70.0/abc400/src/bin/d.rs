@@ -1,9 +1,12 @@
-use itertools::Itertools;
 use petgraph::{algo::dijkstra, graph::DiGraph};
 use proconio::{
     fastout, input,
     marker::{Chars, Usize1},
 };
+use std::sync::OnceLock;
+
+static H: OnceLock<usize> = OnceLock::new();
+static W: OnceLock<usize> = OnceLock::new();
 
 #[fastout]
 fn main() {
@@ -14,70 +17,59 @@ fn main() {
         c: Usize1, d: Usize1,
     }
 
+    H.set(h).unwrap();
+    W.set(w).unwrap();
+
+    let cost = s
+        .iter()
+        .flat_map(|row| row.iter().map(|&c| if c == '.' { 0 } else { 1 }))
+        .collect::<Vec<usize>>();
     let graph = DiGraph::<(), usize, usize>::from_edges(
-        (0..h)
-            .cartesian_product(0..w)
-            .flat_map(|base| edges_4dir(&s, base, h, w)),
+        (0..h * w).flat_map(|base| edges_4dirs(&cost, base)),
     );
 
-    let hashmap = dijkstra(
+    let distance = dijkstra(
         &graph,
-        index_of((a, b), w).into(),
-        Some(index_of((c, d), w).into()),
+        index_of(a, b).into(),
+        Some(index_of(c, d).into()),
         |e| *e.weight(),
     );
 
-    println!("{}", hashmap[&index_of((c, d), w).into()]);
+    println!("{}", distance[&index_of(c, d).into()]);
 }
 
-fn edges_4dir(
-    s: &[Vec<char>],
-    base: (usize, usize),
-    h: usize,
-    w: usize,
-) -> impl Iterator<Item = (usize, usize, usize)> {
-    let (i, j) = base;
-
-    let up = (i + 1).min(h)..(i + 3).min(h);
-    let down = (i.saturating_sub(2)..i).rev();
-    let left = (j.saturating_sub(2)..j).rev();
-    let right = (j + 1).min(w)..(j + 3).min(w);
-
-    let up_edges = up
-        .clone()
-        .map(move |x| (x, j))
-        .zip(weights(&up.map(|x| s[x][j]).collect::<Vec<_>>()));
-    let down_edges = down
-        .clone()
-        .map(move |x| (x, j))
-        .zip(weights(&down.map(|x| s[x][j]).collect::<Vec<_>>()));
-    let left_edges = left
-        .clone()
-        .map(move |y| (i, y))
-        .zip(weights(&left.map(|y| s[i][y]).collect::<Vec<_>>()));
-    let right_edges = right
-        .clone()
-        .map(move |y| (i, y))
-        .zip(weights(&right.map(|y| s[i][y]).collect::<Vec<_>>()));
-
-    up_edges
-        .chain(down_edges)
-        .chain(left_edges)
-        .chain(right_edges)
-        .map(move |(pos, weight)| (index_of(base, w), index_of(pos, w), weight))
+fn edges_4dirs(cost: &[usize], base: usize) -> impl Iterator<Item = (usize, usize, usize)> + '_ {
+    let (i, j) = index_of_2d(base);
+    // 縦方向
+    (i.saturating_sub(2)..=(i + 2).min(*H.get().unwrap() - 1))
+        .filter_map(move |v| {
+            let to = index_of(v, j);
+            match v.abs_diff(i) {
+                0 => None,
+                1 => Some((base, to, cost[to])),
+                2 => Some((base, to, cost[to] | cost[index_of((v + i) / 2, j)])),
+                _ => unreachable!(),
+            }
+        })
+        .chain(
+            // 横方向
+            (j.saturating_sub(2)..=(j + 2).min(*W.get().unwrap() - 1)).filter_map(move |h| {
+                let to = index_of(i, h);
+                match h.abs_diff(j) {
+                    0 => None,
+                    1 => Some((base, to, cost[to])),
+                    2 => Some((base, to, cost[to] | cost[index_of(i, (h + j) / 2)])),
+                    _ => unreachable!(),
+                }
+            }),
+        )
 }
 
-fn weights(v: &[char]) -> Vec<usize> {
-    match v {
-        [] => vec![],
-        ['.'] => vec![0],
-        ['#'] => vec![1],
-        ['.', '.'] => vec![0, 0],
-        ['.', '#'] => vec![0, 1],
-        _ => vec![1, 1],
-    }
+fn index_of(i: usize, j: usize) -> usize {
+    i * W.get().unwrap() + j
 }
 
-fn index_of(pos: (usize, usize), w: usize) -> usize {
-    pos.0 * w + pos.1
+fn index_of_2d(base: usize) -> (usize, usize) {
+    let w = *W.get().unwrap();
+    (base / w, base % w)
 }
