@@ -19,11 +19,11 @@ fn main() {
 
     H.set(h).unwrap();
     W.set(w).unwrap();
-
     let cost = s
         .iter()
         .flat_map(|row| row.iter().map(|&c| if c == '.' { 0 } else { 1 }))
         .collect::<Vec<usize>>();
+
     let graph = DiGraph::<(), usize, usize>::from_edges(
         (0..h * w).flat_map(|base| edges_4dirs(&cost, base)),
     );
@@ -38,6 +38,7 @@ fn main() {
     println!("{}", distance[&index_of(c, d).into()]);
 }
 
+// 上下左右へ移動するコストを計算する
 fn edges_4dirs(cost: &[usize], base: usize) -> impl Iterator<Item = (usize, usize, usize)> + '_ {
     let (i, j) = index_of_2d(base);
     // 縦方向
