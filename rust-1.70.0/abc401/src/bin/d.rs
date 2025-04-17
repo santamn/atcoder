@@ -20,7 +20,8 @@ fn main() {
         })
         .collect::<Vec<_>>();
 
-    if s.iter().filter(|&&c| c == 'o').count() == k {
+    let least_o = s.iter().filter(|&&c| c == 'o').count();
+    if least_o == k {
         // 隣り合う o の情報のみで ? -> . とした段階で、すでに o の数が k と等しい場合
         // 残りの ? -> . と置き換えた文字列を出力
         println!(
@@ -35,18 +36,15 @@ fn main() {
         if s.iter()
             .group_by(|&&c| c == '?')
             .into_iter()
-            .map(|(question, chunk)| {
-                if question {
-                    let c = chunk.count();
-                    (c >> 1) + (c & 1) // o.o.o.o のようにoを配置する
-                } else {
-                    chunk.into_iter().filter(|&&c| c == 'o').count()
-                }
+            .flat_map(|(is_q, chunk)| {
+                let c = chunk.count();
+                is_q.then_some((c >> 1) + (c & 1)) // o.o.o.o のようにoを配置すると考えて o の数をカウント
             })
             .sum::<usize>()
+            + least_o
             == k
         {
-            // ? の数を最大限 o に置き換えた場合、o の数が k と等しくなる場合
+            // ? の数を最大限 o に置き換える場合
             // ????? の塊の長さが奇数個のところは、 o.o.o となる
             // 長さが偶数個の場合は ???? のままでよい
             println!(
@@ -54,9 +52,9 @@ fn main() {
                 s.iter()
                     .group_by(|&&c| c == '?')
                     .into_iter()
-                    .map(|(question, chunk)| {
+                    .map(|(is_q, chunk)| {
                         let run = chunk.collect::<String>();
-                        if question && run.len() & 1 == 1 {
+                        if is_q && run.len() & 1 == 1 {
                             ['o', '.']
                                 .into_iter()
                                 .cycle()
