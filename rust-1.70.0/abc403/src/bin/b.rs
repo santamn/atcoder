@@ -7,7 +7,7 @@ fn main() {
         u: Chars, // ?を含まない文字列
     }
 
-    for i in 0..(t.len() - u.len() + 1) {
+    for i in 0..=(t.len() - u.len()) {
         if u.iter().zip(&t[i..]).all(|(&x, &y)| x == y || y == '?') {
             println!("Yes");
             return;
